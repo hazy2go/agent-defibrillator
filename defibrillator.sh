@@ -136,7 +136,9 @@ fi
 
 # Quick health check
 if check_process; then
-    exit 0  # All good, silent exit
+    # Touch log file so dashboards can track lastRun
+    touch "$LOG_FILE"
+    exit 0
 fi
 
 # Process not found - start emergency protocol
