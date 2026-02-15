@@ -13,7 +13,11 @@ And you're not home. Or you're asleep. Or you're touching grass (good for you).
 ```
 Every 10 minutes:
     │
-    ├─ Agent alive? → 😴 (sleep)
+    ├─ Agent alive?
+    │       │
+    │       └─ Version match? → 😴 (sleep)
+    │               │
+    │               └─ Stale version? → 🔄 Restart + 📢 Notify
     │
     └─ Agent dead?
            │
@@ -21,7 +25,7 @@ Every 10 minutes:
            │
            └─ Still dead after 3 checks?
                   │
-                  └─ 🫀⚡ "CLEAR!" → Full restart
+                  └─ 🫀⚡ "CLEAR!" → Full restart + 📢 Notify
                          │
                          ├─ ✅ Pulse restored!
                          │
@@ -33,6 +37,11 @@ Every 10 minutes:
 - 🔒 Lock file prevents concurrent runs
 - 🧹 Kills orphaned processes before restart
 - 📝 Only logs when something goes wrong (no spam)
+
+**v2 features:**
+- 🔍 **Version mismatch detection** — catches stale gateway processes running old code after npm updates
+- 📢 **Discord notifications** — get pinged when your agent gets shocked back to life
+- ⏰ 1-hour cooldown for version-based restarts (separate from crash cooldown)
 
 ## Quick Install
 
@@ -89,6 +98,14 @@ Set these before running, or edit the script:
 | `DEFIB_RETRY_DELAY` | `10` | Seconds between retries |
 | `DEFIB_MAX_RETRIES` | `3` | Retries before restarting |
 | `DEFIB_COOLDOWN` | `300` | Seconds between restarts |
+| `DEFIB_VERSION_COOLDOWN` | `3600` | Seconds between version restarts |
+
+### Discord Notifications (v2)
+Edit the script to set your Discord channel ID:
+```bash
+DISCORD_CHANNEL="your-channel-id-here"
+```
+Uses `openclaw message send` — requires OpenClaw to be configured with Discord.
 
 ### Change Check Interval
 Edit the plist or reinstall:
