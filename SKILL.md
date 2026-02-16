@@ -1,28 +1,23 @@
 ---
 name: agent-defibrillator
-description: Watchdog that monitors your AI agent gateway and restarts it when it crashes. Triggers on "install defibrillator", "agent watchdog", "gateway monitor", "auto-restart agent", or "keep agent alive". macOS launchd service with Discord notifications.
+description: Watchdog that monitors your AI agent gateway and restarts it when it crashes. Triggers on "install defibrillator", "agent watchdog", "gateway monitor", "auto-restart agent", or "keep agent alive". macOS launchd service with optional Discord notifications.
 ---
 
 # Agent Defibrillator
 
-Watchdog service that monitors your AI agent gateway and shocks it back to life when it crashes.
+Watchdog service that monitors your AI agent gateway and restarts it when it crashes.
 
 ## What It Does
 
 - Checks gateway health every 10 minutes
 - Detects crashes and stale processes
 - Auto-restarts with cooldown protection
-- Sends Discord notifications on restart
+- Optional Discord notifications on restart
 - Detects version mismatches after updates
 
 ## Install
 
-**One-liner:**
-```bash
-curl -fsSL https://raw.githubusercontent.com/hazy2go/agent-defibrillator/main/install.sh | bash
-```
-
-**Or clone:**
+**Recommended (review code first):**
 ```bash
 git clone https://github.com/hazy2go/agent-defibrillator.git
 cd agent-defibrillator
@@ -35,8 +30,6 @@ cd agent-defibrillator
 launchctl list | grep defib
 ```
 
-Should show the service running.
-
 ## Configure
 
 Edit `~/.openclaw/scripts/defibrillator.sh`:
@@ -47,7 +40,7 @@ Edit `~/.openclaw/scripts/defibrillator.sh`:
 | `DEFIB_RETRY_DELAY` | `10` | Seconds between retries |
 | `DEFIB_MAX_RETRIES` | `3` | Retries before restart |
 | `DEFIB_COOLDOWN` | `300` | Seconds between restarts |
-| `DISCORD_CHANNEL` | (empty) | Channel ID for notifications |
+| `DISCORD_CHANNEL` | (empty) | Your channel ID for notifications |
 
 ## Commands
 

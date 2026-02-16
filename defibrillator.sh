@@ -18,7 +18,7 @@ GATEWAY_PLIST="$HOME/Library/LaunchAgents/ai.openclaw.gateway.plist"
 GATEWAY_LABEL="ai.openclaw.gateway"
 
 # Notification config
-DISCORD_CHANNEL="1464957946227327242"
+DISCORD_CHANNEL=""  # Set your Discord channel ID here for notifications
 
 # Timing config
 HEALTH_TIMEOUT=10         # seconds to wait for process check
