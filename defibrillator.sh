@@ -18,7 +18,7 @@ GATEWAY_PLIST="$HOME/Library/LaunchAgents/ai.openclaw.gateway.plist"
 GATEWAY_LABEL="ai.openclaw.gateway"
 
 # Notification config
-DISCORD_CHANNEL=""  # Set your Discord channel ID here for notifications
+DISCORD_CHANNEL="1464957946227327242"
 
 # Timing config
 HEALTH_TIMEOUT=10         # seconds to wait for process check
@@ -132,19 +132,8 @@ restart_gateway() {
         return 1
     fi
 
-    # Step 1: Try launchctl kickstart -k (cleanest method)
-    log "RESTART: Trying kickstart -k..."
-    if launchctl kickstart -k "gui/$(id -u)/$GATEWAY_LABEL" 2>> "$LOG_FILE"; then
-        sleep 10
-        if check_process; then
-            log "RESTART: SUCCESS via kickstart"
-            date +%s > "$COOLDOWN_FILE"
-            return 0
-        fi
-    fi
-
-    # Step 2: Fallback - bootout then bootstrap
-    log "RESTART: Kickstart failed, trying bootout/bootstrap..."
+    # Step 1: bootout then bootstrap (most reliable on macOS)
+    log "RESTART: Using bootout/bootstrap..."
     launchctl bootout "gui/$(id -u)/$GATEWAY_LABEL" 2>> "$LOG_FILE" || true
     sleep 3
 
@@ -164,8 +153,31 @@ restart_gateway() {
         log "RESTART: SUCCESS via bootstrap"
         date +%s > "$COOLDOWN_FILE"
         return 0
+    fi
+
+    # Bootstrap failed - try openclaw doctor --fix
+    log "RESTART: Bootstrap failed, running 'openclaw doctor --fix'..."
+    openclaw doctor --fix --non-interactive 2>> "$LOG_FILE"
+    sleep 5
+
+    if check_process; then
+        log "RESTART: SUCCESS via doctor --fix"
+        date +%s > "$COOLDOWN_FILE"
+        return 0
+    fi
+
+    # Still failed - try aggressive fix
+    log "RESTART: Doctor failed, trying 'openclaw doctor --fix --force'..."
+    openclaw doctor --fix --force --non-interactive 2>> "$LOG_FILE"
+    sleep 5
+
+    if check_process; then
+        log "RESTART: SUCCESS via doctor --fix --force"
+        date +%s > "$COOLDOWN_FILE"
+        return 0
     else
-        log "RESTART: FAILED - manual intervention needed"
+        log "RESTART: ALL METHODS FAILED - manual intervention needed"
+        notify "🚨 Gateway watchdog: ALL restart methods failed! Manual intervention required."
         date +%s > "$COOLDOWN_FILE"
         return 1
     fi
